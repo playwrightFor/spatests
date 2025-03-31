@@ -53,6 +53,9 @@ screenshots/*.png
 .target
 /target/
 allure-results/
+.allure
+/allure
+/allure/
 
 ### Trace ###
 /trace

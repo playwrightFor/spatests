@@ -55,7 +55,6 @@ public class AddAndCompleteTodoTest {
         playwright.close();
     }
 
-
     @AfterEach
     void closeContext() {
         if (context != null) {
