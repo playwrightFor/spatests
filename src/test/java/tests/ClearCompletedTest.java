@@ -1,61 +1,46 @@
 package tests;
 
-import com.microsoft.playwright.*;
-import org.junit.jupiter.api.*;
-import pages.TodoPage;
+import base.BaseTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class ClearCompletedTest {
-    static Playwright playwright;
-    static Browser browser;
-    BrowserContext context;
-    Page page;
-    TodoPage todoPage;
+/**
+ * Тестирование очистки выполненных задач.
+ * Проверяет корректность удаления завершенных задач.
+ */
+public class ClearCompletedTest extends BaseTest {
 
-
-    @BeforeAll
-    static void launchBrowser() {
-        playwright = Playwright.create();
-    }
-
-    @BeforeEach
-    void createContextAndPage() {
-        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
-        context = browser.newContext();
-        page = context.newPage();
-        todoPage = new TodoPage(page);
-        todoPage.navigate();
-    }
-
-
+    /**
+     * Проверяет очистку задач и сохранение активных
+     */
     @Test
     @DisplayName("Проверка очистки завершенных задач")
     void testClearCompleted() {
+
         todoPage.addTodo("Task to complete");
         todoPage.addTodo("Task to keep");
-
         todoPage.completeTodo(0);
+
         todoPage.clearCompleted();
 
-        assertEquals(1, todoPage.getTodosCount());
-        assertEquals("Task to keep",
-                page.locator(".todo-list li").first().locator("label").textContent().trim());
+        assertEquals(1, todoPage.getTodosCount(), "Неверное количество задач после очистки");
+        assertEquals("Task to keep", getTaskText(),
+                "Неверный текст оставшейся задачи");
+        assertFalse(page.locator(".clear-completed").isVisible(),
+                "Кнопка очистки должна быть скрыта");
     }
 
-    @AfterAll
-    static void closeBrowser() {
-        if (browser != null) {
-            browser.close();
-        }
-        playwright.close();
-    }
-
-
-    @AfterEach
-    void closeContext() {
-        if (context != null) {
-            context.close();
-        }
+    /**
+     * Возвращает текст задачи по индексу
+     */
+    private String getTaskText() {
+        return page.locator(".todo-list li")
+                .nth(0)
+                .locator("label")
+                .textContent()
+                .trim();
     }
 }

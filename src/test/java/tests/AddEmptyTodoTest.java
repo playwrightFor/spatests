@@ -1,54 +1,40 @@
 package tests;
 
-import com.microsoft.playwright.*;
-import org.junit.jupiter.api.*;
-import pages.TodoPage;
+import base.BaseTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AddEmptyTodoTest {
-    static Playwright playwright;
-    static Browser browser;
-    BrowserContext context;
-    Page page;
-    TodoPage todoPage;
+/**
+ * Тестирование обработки пустых задач.
+ * Проверяет, что задачи из пробелов не добавляются в список.
+ */
+public class AddEmptyTodoTest extends BaseTest {
 
-
-    @BeforeAll
-    static void launchBrowser() {
-        playwright = Playwright.create();
-    }
-
-    @BeforeEach
-    void createContextAndPage() {
-        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
-        context = browser.newContext();
-        page = context.newPage();
-        todoPage = new TodoPage(page);
-        todoPage.navigate();
-    }
-
+    /**
+     * Проверяет отсутствие изменений в списке после добавления пробелов
+     */
     @Test
     @DisplayName("Проверка добавления пустой задачи")
     void testAddEmptyTodo() {
         int initialCount = todoPage.getTodosCount();
+
         todoPage.addTodo("   ");
-        assertEquals(initialCount, todoPage.getTodosCount(), "Пустая задача не должна добавляться");
+        assertEquals(initialCount, todoPage.getTodosCount(),
+                "Количество задач изменилось после добавления пустой задачи");
+
+        assertTrue(verifyNoEmptyTasks(), "В списке присутствуют пустые задачи");
     }
 
-    @AfterAll
-    static void closeBrowser() {
-        if (browser != null) {
-            browser.close();
-        }
-        playwright.close();
-    }
-
-
-    @AfterEach
-    void closeContext() {
-        if (context != null) {
-            context.close();
-        }
+    /**
+     * Проверяет отсутствие задач с пустым текстом
+     */
+    private boolean verifyNoEmptyTasks() {
+        return page.locator(".todo-list li label")
+                .allTextContents()
+                .stream()
+                .noneMatch(String::isBlank);
     }
 }

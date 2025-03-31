@@ -1,64 +1,55 @@
 package tests;
 
-import com.microsoft.playwright.*;
+import base.BaseTest;
 import com.microsoft.playwright.options.AriaRole;
-import org.junit.jupiter.api.*;
-import pages.TodoPage;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PersistenceAfterReloadTest {
+/**
+ * Тестирование сохранения состояния после перезагрузки.
+ * Проверяет сохранение данных задач между сессиями.
+ */
+public class PersistenceAfterReloadTest extends BaseTest {
 
-    static Playwright playwright;
-    static Browser browser;
-    BrowserContext context;
-    Page page;
-    TodoPage todoPage;
-
-
-    @BeforeAll
-    static void launchBrowser() {
-        playwright = Playwright.create();
-    }
-
-    @BeforeEach
-    void createContextAndPage() {
-        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
-        context = browser.newContext();
-        page = context.newPage();
-        todoPage = new TodoPage(page);
-        todoPage.navigate();
-    }
-
-
+    /**
+     * Проверяет сохранение задач и их статусов после обновления страницы
+     */
     @Test
     @DisplayName("Проверка сохранения состояния после перезагрузки")
     void testPersistenceAfterReload() {
+
         todoPage.addTodo("Persistent Task");
         todoPage.completeTodo(0);
+        String initialText = getTaskText();
 
         todoPage.reloadAndKeepState();
 
-        assertEquals(1, todoPage.getTodosCount());
-        assertTrue(page.locator(".todo-list li").first()
-                .getByRole(AriaRole.CHECKBOX).isChecked());
+        assertEquals(1, todoPage.getTodosCount(), "Количество задач после перезагрузки");
+        assertTrue(getCheckboxState(), "Статус выполнения не сохранен");
+        assertEquals(initialText, getTaskText(), "Текст задачи изменился");
     }
 
-    @AfterAll
-    static void closeBrowser() {
-        if (browser != null) {
-            browser.close();
-        }
-        playwright.close();
+    /**
+     * Возвращает текст задачи по индексу
+     */
+    private String getTaskText() {
+        return page.locator(".todo-list li")
+                .nth(0)
+                .locator("label")
+                .textContent()
+                .trim();
     }
 
-
-    @AfterEach
-    void closeContext() {
-        if (context != null) {
-            context.close();
-        }
+    /**
+     * Возвращает состояние чекбокса задачи по индексу
+     */
+    private boolean getCheckboxState() {
+        return page.locator(".todo-list li")
+                .nth(0)
+                .getByRole(AriaRole.CHECKBOX)
+                .isChecked();
     }
-
 }
