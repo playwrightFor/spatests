@@ -9,9 +9,13 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <allure.version>2.25.0</allure.version>
-        <allure-maven.version>2.12.0</allure-maven.version>
+        <owner.version>1.0.12</owner.version>
+        <junit.jupiter.version>5.11.4</junit.jupiter.version>
         <junit.platform.version>1.10.0</junit.platform.version>
+        <allure.version>2.25.0</allure.version>
+        <allure-maven.version>2.15.2</allure-maven.version>
+        <extentreports.version>5.1.1</extentreports.version>
+        <playwright.version>1.50.0</playwright.version>
         <surefire.version>3.2.5</surefire.version>
         <compiler.version>3.11.0</compiler.version>
         <maven.compiler.source>17</maven.compiler.source>
@@ -21,28 +25,46 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-suite</artifactId>
-            <version>${junit.platform.version}</version>
+            <groupId>org.aeonbits.owner</groupId>
+            <artifactId>owner</artifactId>
+            <version>${owner.version}</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
-            <version>1.50.0</version>
+            <version>${playwright.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.11.4</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.11.4</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit5</artifactId>
+            <version>${allure.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>${extentreports.version}</version>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
