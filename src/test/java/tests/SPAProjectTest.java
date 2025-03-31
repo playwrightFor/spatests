@@ -8,13 +8,18 @@ import pages.TodoPage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Класс SPAProjectTest предназначен для автоматизации тестирования
+ * одностраничного приложения (SPA) TodoMVC с использованием Playwright и JUnit.
+ * В этом классе проводятся тесты для проверки функциональности приложения,
+ * включая добавление, завершение и удаление задач.
+ */
 public class SPAProjectTest {
     static Playwright playwright;
     static Browser browser;
     BrowserContext context;
     Page page;
     TodoPage todoPage;
-
 
     @BeforeAll
     static void launchBrowser() {
@@ -23,15 +28,15 @@ public class SPAProjectTest {
 
     @BeforeEach
     void createContextAndPage() {
-        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
         context = browser.newContext();
         page = context.newPage();
         todoPage = new TodoPage(page);
         todoPage.navigate();
     }
 
-
     @Test
+    @DisplayName("Проверка добавления и завершения задач")
     void testAddAndCompleteTodo() {
         todoPage.addTodo("Task 1");
         assertEquals(1, todoPage.getTodosCount(), "Количество задач после добавления первой задачи");
@@ -48,8 +53,8 @@ public class SPAProjectTest {
         assertEquals(1, todoPage.getVisibleTodosCount(), "Количество активных задач должно быть 1");
     }
 
-
     @Test
+    @DisplayName("Проверка очистки завершенных задач")
     void testClearCompleted() {
         todoPage.addTodo("Task to complete");
         todoPage.addTodo("Task to keep");
@@ -63,6 +68,7 @@ public class SPAProjectTest {
     }
 
     @Test
+    @DisplayName("Проверка сохранения состояния после перезагрузки")
     void testPersistenceAfterReload() {
         todoPage.addTodo("Persistent Task");
         todoPage.completeTodo(0);
@@ -75,12 +81,16 @@ public class SPAProjectTest {
     }
 
     @Test
+    @DisplayName("Проверка добавления пустой задачи")
     void testAddEmptyTodo() {
         int initialCount = todoPage.getTodosCount();
         todoPage.addTodo("   ");
         assertEquals(initialCount, todoPage.getTodosCount(), "Пустая задача не должна добавляться");
     }
 
+    /**
+     * Метод закрывает браузер после выполнения всех тестов.
+     */
     @AfterAll
     static void closeBrowser() {
         if (browser != null) {
@@ -89,7 +99,9 @@ public class SPAProjectTest {
         playwright.close();
     }
 
-
+    /**
+     * Метод закрывает контекст после каждого теста.
+     */
     @AfterEach
     void closeContext() {
         if (context != null) {
